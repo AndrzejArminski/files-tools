@@ -1,0 +1,28 @@
+# copy-files-subfolders-to-folder.WSF
+# Copies files with Extension and SearchString in file names from SourceRootFolder's subfolders to DestinationFolder.
+
+# Supply script arguments by editing constants below:
+
+<job id="copy-files-subfolders-to-folder.WSF">
+
+	<script language="VBScript" src="files-tools-LIB.vbs"/>
+	<script language="VBScript">
+		Option Explicit
+		Const SourceRootFolder = "F:\OneDrive\AstroProjects\test\SKY\"   ' Folder with subfolders containing files to be copied.
+		Const Extension = "txt"		' Only files with this Extension will be copied. No wildcards. Required.
+		Const SearchString = ""	' Only files with SearchString within filename will be copied. Give empty string to copy all files.
+		
+		Const DestinationFolder = "F:\OneDrive\AstroProjects\test\SKY\20171211\03\"    ' Single destination folder.
+		Const overWrite = True		' When True, files in DestinationFolder will be overwritten!
+		
+		' DestinationFilenamePrefix is attached at the begining of destination file names.
+		Const DestinationFilenamePrefix	= "CSV_"	' example: "S_7865-4565.fit"
+		
+		' Replace a non-empty oldString to newString in destination file names while copying files.
+		Const OldString = "7"		' OldString may be empty to ignore.
+		Const NewString = "x"
+		
+		CopyFilesSubfoldersToFolder SourceRootFolder, DestinationFolder, DestinationFilenamePrefix, Extension, SearchString, OldString, NewString, overWrite
+	
+	</script>
+</job>

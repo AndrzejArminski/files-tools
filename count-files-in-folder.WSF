@@ -1,0 +1,17 @@
+# count-files-in-folder.WSF
+# Counts files with Extension and SearchString in file names, in Folder.
+
+# Supply script arguments by editing constants below:
+
+<job id="count-files-in-folder.WSF">
+
+	<script language="VBScript" src="files-tools-LIB.vbs"/>
+	<script language="VBScript">
+		Option Explicit
+		Const Folder = "F:\OneDrive\AstroProjects\test\SKY\"   ' Folder with files to be counted.
+		Const Extension = "txt"		' Only files with this Extension will be counted. No wildcards. Required.
+		Const SearchString = "log"		' Only files with SearchString within filename will be counted. Give empty string to count all files.
+		
+		DeleteFilesFromFolder Folder, Extension, SearchString, False
+	</script>
+</job>

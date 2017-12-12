@@ -1,0 +1,25 @@
+# rename-files-in-subfolders.WSF
+# Renames files with Extension and SearchString in file names, in RootFolder's subfolders.
+
+# Supply script arguments by editing constants below:
+
+<job id="rename-files-in-subfolders.WSF">
+
+	<script language="VBScript" src="files-tools-LIB.vbs"/>
+	<script language="VBScript">
+		Option Explicit
+		Const RootFolder = "F:\OneDrive\AstroProjects\test\SKY\"   ' Folder with subfolders containing files to be renamed.
+		Const Extension = "txt"		' Only files with this Extension will be renamed. No wildcards. Required.
+		Const SearchString = "S_"	' Only files with SearchString within filename will be renamed. Give empty string to rename all files.
+		
+		' DestinationFilenamePrefix is attached at the begining of destination file names.
+		Const DestinationFilenamePrefix	= ""	' example: "S_7865-4565.fit"
+		
+		' Replace a non-empty oldString to newString in destination file names while renaming files.
+		Const OldString = "S_"		' OldString may be empty to ignore.
+		Const NewString = "Z_"
+
+		MoveFilesSubfoldersToSubfolders RootFolder, RootFolder, "", DestinationFilenamePrefix, Extension, SearchString, OldString, NewString, True
+	
+	</script>
+</job>

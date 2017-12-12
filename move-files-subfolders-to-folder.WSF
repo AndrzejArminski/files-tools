@@ -1,0 +1,28 @@
+# move-files-subfolders-to-folder.WSF
+# Moves files with Extension and SearchString in file names from SourceRootFolder's subfolders to DestinationFolder.
+
+# Supply script arguments by editing constants below:
+
+<job id="move-files-subfolders-to-folder.WSF">
+
+	<script language="VBScript" src="files-tools-LIB.vbs"/>
+	<script language="VBScript">
+		Option Explicit
+		Const SourceRootFolder = "F:\OneDrive\AstroProjects\test\STARS\"   ' Folder with subfolders containing files to be moved.
+		Const Extension = "txt"		' Only files with this Extension will be moved. No wildcards. Required.
+		Const SearchString = ""		' Only files with SearchString within filename will be moved. Give empty string to move all files.
+		
+		Const DestinationFolder = "F:\OneDrive\AstroProjects\test\SKY\20171210\"   ' Single destination folder.
+		Const overWrite = True		' When True, files in DestinationFolder will be overwritten!
+		
+		' DestinationFilenamePrefix is attached at the begining of destination file names.
+		Const DestinationFilenamePrefix	= ""	' example: "S_7865-4565.fit"
+		
+		' Replace a non-empty oldString to newString in destination file names while moving files.
+		Const OldString = ""		' OldString may be empty to ignore.
+		Const NewString = ""
+		
+		MoveFilesSubfoldersToFolder SourceRootFolder, DestinationFolder, DestinationFilenamePrefix, Extension, SearchString, OldString, NewString, overWrite
+	
+	</script>
+</job>

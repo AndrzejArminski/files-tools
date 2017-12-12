@@ -1,0 +1,17 @@
+# count-files-in-subfolders.WSF
+# Counts files with Extension and SearchString in file names, in all subfolders of RootFolder.
+
+# Supply script arguments by editing constants below:
+
+<job id="count-files-in-subfolders.WSF">
+
+	<script language="VBScript" src="files-tools-LIB.vbs"/>
+	<script language="VBScript">
+		Option Explicit
+		Const RootFolder = "F:\OneDrive\AstroProjects\test\SKY\"   ' Folder with subfolders containing files to be counted.
+		Const Extension = "txt"		' Only files with this Extension will be counted. No wildcards. Required.
+		Const SearchString = ""		' Only files with SearchString within filename will be counted. Give empty string to count all files.
+		
+		DeleteFilesFromSubfolders RootFolder, Extension, SearchString, False	
+	</script>
+</job>

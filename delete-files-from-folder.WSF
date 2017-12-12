@@ -1,0 +1,17 @@
+# delete-files-from-folder.WSF
+# Deletes files with Extension and SearchString in file names from Folder.
+
+# Set script arguments by editing constants below:
+
+<job id="delete-files-from-folder.WSF">
+
+	<script language="VBScript" src="files-tools-LIB.vbs"/>
+	<script language="VBScript">
+		Option Explicit
+		Const Folder = "F:\OneDrive\AstroProjects\test\SKY\20171211\"   ' Folder with files to be deleted.
+		Const Extension = "txt"		' Only files with this Extension will be deleted. No wildcards. Required.
+		Const SearchString = ""	' Only files with SearchString within filename will be deleted. Give empty string to delete all files.
+		
+		DeleteFilesFromFolder Folder, Extension, SearchString, True
+	</script>
+</job>

@@ -1,0 +1,17 @@
+# delete-files-from-subfolders.WSF
+# Deletes files with Extension and SearchString in file names from all subfolders of RootFolder.
+
+# Set script arguments by editing constants below:
+
+<job id="delete-files-from-subfolders.WSF">
+
+	<script language="VBScript" src="files-tools-LIB.vbs"/>
+	<script language="VBScript">
+		Option Explicit
+		Const RootFolder = "F:\OneDrive\AstroProjects\test\STARS\"   ' Folder with subfolders containing files to be deleted.
+		Const Extension = "txt"		' Only files with this Extension will be deleted. No wildcards. Required.
+		Const SearchString = ""	' Only files with SearchString within filename will be deleted. Give empty string to delete all files.
+		
+		DeleteFilesFromSubfolders RootFolder, Extension, SearchString, True	
+	</script>
+</job>

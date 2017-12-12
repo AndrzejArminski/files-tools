@@ -1,0 +1,16 @@
+# delete-empty-subfolders.WSF
+# Deletes empty subfolders of RootFolder.
+
+# Supply script arguments by editing constants below:
+
+<job id="delete-empty-subfolders.WSF">
+
+	<script language="VBScript" src="files-tools-LIB.vbs"/>
+	<script language="VBScript">
+	
+		Option Explicit
+		Const RootFolder = "F:\OneDrive\AstroProjects\test\SKY\"   ' Folder with empty subfolders to be deleted.
+		
+		DeleteEmptySubfolders RootFolder
+	</script>
+</job>

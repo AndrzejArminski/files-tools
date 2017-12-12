@@ -1,0 +1,24 @@
+# rename-files-in-folder.WSF
+# Renames files with Extension and SearchString in file names, in Folder.
+
+# Supply script arguments by editing constants below:
+
+<job id="rename-files-in-folder.WSF">
+
+	<script language="VBScript" src="files-tools-LIB.vbs"/>
+	<script language="VBScript">
+		Option Explicit
+		Const Folder = "F:\OneDrive\AstroProjects\test\SKY\"     ' Single folder containing files to be renamed.
+		Const Extension = "txt"		' Only files with this Extension will be renamed. No wildcards. Required.
+		Const SearchString = "tool"	' Only files with SearchString within filename will be renamed. Give empty string to rename all files.
+		
+		' DestinationFilenamePrefix is attached at the begining of destination file names.
+		Const DestinationFilenamePrefix	= ""	' example: "S_7865-4565.fit"
+		
+		' Replace a non-empty oldString to newString in destination file names while renaming files.
+		Const OldString = "tool"		' OldString may be empty to ignore.
+		Const NewString = "box"
+		
+		MoveFilesFolderToFolder Folder, Folder, DestinationFilenamePrefix, Extension, SearchString, OldString, NewString, True
+	</script>
+</job>

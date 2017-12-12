@@ -1,0 +1,34 @@
+# move-files-subfolders-to-subfolders.WSF
+# Moves files with Extension and SearchString in file names from SourceRootFolder's subfolders to DestinationRootFolder's subfolders using StarNames as subfolder's names.
+# StarName is derived from file name, as the last underscore delimited token.
+
+# Supply script arguments by editing constants below:
+
+<job id="move-files-subfolders-to-subfolders.WSF">
+
+	<script language="VBScript" src="files-tools-LIB.vbs"/>
+	<script language="VBScript">
+		Option Explicit
+		Const SourceRootFolder = "F:\OneDrive\AstroProjects\test\SKY\"   ' Folder with subfolders containing files to be moved.
+		Const Extension = "txt"		' Only files with this Extension will be moved. No wildcards. Required.
+		Const SearchString = "_"	' Only files with SearchString within filename will be moved. Give empty string to move all files.
+
+		Const DestinationRootFolder = "F:\OneDrive\AstroProjects\test\STARS\"    ' Destination root folder.
+		' Files will be moved to DestinationRootFolder's subfolders named after StarNames derived from file name.
+		Const overWrite = False		' When True, files in destination folder will be overwritten!
+		
+		' By supplying non-empty DestinationFolderSuffix you move files to DestinationRootFolder's subfolder's subfolder: (DestinationRootFolder\StarName\DestinationFolderSuffix\).
+		' Example: set "01\" to move to "F:\OneDrive\AstroProjects\test\Stars\AA And\01\" 
+		Const DestinationFolderSuffix = "01\"	' "01\"
+		
+		' DestinationFilenamePrefix is attached at the begining of destination file names.
+		Const DestinationFilenamePrefix	= "S_"	' example: "S_7865-4565.fit"
+		
+		' Replace a non-empty oldString to newString in destination file names while moving files.
+		Const OldString = "_"		' OldString may be empty to ignore.
+		Const NewString = "_V_"
+		
+		MoveFilesSubfoldersToSubfolders SourceRootFolder, DestinationRootFolder, DestinationFolderSuffix, DestinationFilenamePrefix, Extension, SearchString, OldString, NewString, overWrite
+	
+	</script>
+</job>

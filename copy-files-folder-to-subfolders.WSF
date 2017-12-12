@@ -1,0 +1,35 @@
+# copy-files-folder-to-subfolders.WSF
+# Copies files with Extension and SearchString in file names from SourceFolder to DestinationRootFolder's subfolders using StarNames as subfolder's names.
+# StarName is derived from file name, as the last underscore delimited token.
+
+# Supply script arguments by editing constants below:
+
+<job id="copy-files-folder-to-subfolders.WSF">
+
+	<script language="VBScript" src="files-tools-LIB.vbs"/>
+	<script language="VBScript">
+		Option Explicit
+		Const SourceFolder = "F:\OneDrive\AstroProjects\test\SKY\20171210\"    ' Single folder containing files to be copied.
+		Const Extension = "txt"		' Only files with this Extension will be copied. No wildcards. Required.
+		Const SearchString = ""	' Only files with SearchString within filename will be copied. Give empty string to copy all files.
+
+		Const DestinationRootFolder = "F:\OneDrive\AstroProjects\test\STARS\"    ' Destination root folder.
+		' Files will be copied to DestinationRootFolder's subfolders named after StarNames derived from file name.
+		Const overWrite = False		' When True, files in destination folder will be overwritten!
+		
+		' By supplying non-empty DestinationFolderSuffix you copy files to DestinationRootFolder's subfolder's subfolder: (DestinationRootFolder\StarName\DestinationFolderSuffix\).
+		' Example: set "01\" to copy to "F:\OneDrive\AstroProjects\test\Stars\AA And\01\" 
+		Const DestinationFolderSuffix = ""	' "01\"
+		
+		' DestinationFilenamePrefix is attached at the begining of destination file names.
+		Const DestinationFilenamePrefix	= "S_"	' example: "S_7865-4565.fit"
+		
+		' Replace a non-empty oldString to newString in destination file names while copying files.
+		Const OldString = ""		' OldString may be empty to ignore.
+		Const NewString = ""
+		
+		CopyFilesFolderToSubfolders SourceFolder, DestinationRootFolder, DestinationFolderSuffix, DestinationFilenamePrefix, Extension, SearchString, OldString, NewString, overWrite
+	
+	</script>
+</job>
+
