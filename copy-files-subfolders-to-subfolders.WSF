@@ -12,6 +12,10 @@
 		Const SourceRootFolder = "F:\OneDrive\AstroProjects\test\SKY\"   ' Folder with subfolders containing files to be copied.
 		Const Extension = "txt"		' Only files with this Extension will be copied. No wildcards. Required.
 		Const SearchString = ""	' Only files with SearchString within filename will be copied. Give empty string to copy all files.
+		
+		' By supplying non-empty SourceFolderSuffix you copy files from SourceRootFolder's subfolder's subfolder: (SourceRootFolder\AnySubfolder\SourceFolderSuffix\).
+		' Example: set "01\" to copy from "F:\OneDrive\AstroProjects\test\SKY\57456\01\" 
+		Const SourceFolderSuffix = "03\"	' "01\"
 
 		Const DestinationRootFolder = "F:\OneDrive\AstroProjects\test\STARS\"    ' Destination root folder.
 		' Files will be copied to DestinationRootFolder's subfolders named after StarNames derived from file name.
@@ -28,7 +32,7 @@
 		Const OldString = ""		' OldString may be empty to ignore.
 		Const NewString = ""
 		
-		CopyFilesSubfoldersToSubfolders SourceRootFolder, DestinationRootFolder, DestinationFolderSuffix, DestinationFilenamePrefix, Extension, SearchString, OldString, NewString, overWrite
+		CopyFilesSubfoldersToSubfolders SourceRootFolder, SourceFolderSuffix, DestinationRootFolder, DestinationFolderSuffix, DestinationFilenamePrefix, Extension, SearchString, OldString, NewString, overWrite
 	
 	</script>
 </job>

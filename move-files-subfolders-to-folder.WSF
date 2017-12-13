@@ -8,11 +8,15 @@
 	<script language="VBScript" src="files-tools-LIB.vbs"/>
 	<script language="VBScript">
 		Option Explicit
-		Const SourceRootFolder = "F:\OneDrive\AstroProjects\test\STARS\"   ' Folder with subfolders containing files to be moved.
+		Const SourceRootFolder = "F:\OneDrive\AstroProjects\test\SKY\"   ' Folder with subfolders containing files to be moved.
 		Const Extension = "txt"		' Only files with this Extension will be moved. No wildcards. Required.
-		Const SearchString = ""		' Only files with SearchString within filename will be moved. Give empty string to move all files.
+		Const SearchString = "SS"		' Only files with SearchString within filename will be moved. Give empty string to move all files.
 		
-		Const DestinationFolder = "F:\OneDrive\AstroProjects\test\SKY\20171210\"   ' Single destination folder.
+		' By supplying non-empty SourceFolderSuffix you move files from SourceRootFolder's subfolder's subfolder: (SourceRootFolder\AnySubfolder\SourceFolderSuffix\).
+		' Example: set "01\" to move from "F:\OneDrive\AstroProjects\test\SKY\57456\01\" 
+		Const SourceFolderSuffix = "03\"	' "01\"
+		
+		Const DestinationFolder = "F:\OneDrive\AstroProjects\test\WORK\"   ' Single destination folder.
 		Const overWrite = True		' When True, files in DestinationFolder will be overwritten!
 		
 		' DestinationFilenamePrefix is attached at the begining of destination file names.
@@ -22,7 +26,7 @@
 		Const OldString = ""		' OldString may be empty to ignore.
 		Const NewString = ""
 		
-		MoveFilesSubfoldersToFolder SourceRootFolder, DestinationFolder, DestinationFilenamePrefix, Extension, SearchString, OldString, NewString, overWrite
+		MoveFilesSubfoldersToFolder SourceRootFolder, SourceFolderSuffix, DestinationFolder, DestinationFilenamePrefix, Extension, SearchString, OldString, NewString, overWrite
 	
 	</script>
 </job>

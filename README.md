@@ -41,12 +41,13 @@ Copies files with Extension and SearchString in file names from SourceFolder to 
 
 ___
 ### copy-files-subfolders-to-folder.WSF
-**CopyFilesSubfoldersToFolder (SourceRootFolder, DestinationFolder,**
+**CopyFilesSubfoldersToFolder (SourceRootFolder, SourceFolderSuffix, DestinationFolder,**
 **Extension, SearchString, OldString, NewString, DestinationFilenamePrefix, Overwrite)**
 
 Copies files with Extension and SearchString in file names from SourceRootFolder's subfolders to DestinationFolder.
 >Arguments:  
 **SourceRootFolder** - Folder with subfolders containing files to be copied.  
+**SourceFolderSuffix** - SourceRootFolder's any subfolder's subfolder name. By supplying non-empty SourceFolderSuffix you copy files from SourceRootFolder's subfolder's subfolder: (SourceRootFolder\AnySubfolder\SourceFolderSuffix\).  
 **DestinationFolder** - Single destination folder.
 
 ___
@@ -58,18 +59,19 @@ Copies files with Extension and SearchString in file names from SourceFolder to 
 >Arguments:  
 **SourceFolder** - Single folder containing files to be copied.  
 **DestinationRootFolder** - Destination root folder. Files will be copied to DestinationRootFolder's subfolders named after StarNames derived from file name.  
-**DestinationFolderSuffix** - DestinationRootFolder's StarName subfolder's subfolder name. By supplying non-empty DestinationFolderSuffix you copy files to DestinationRootFolder's subfolder's subfolder: (DestinationRootFolder\StarName\DestinationFolderSuffix\).
+**DestinationFolderSuffix** - DestinationRootFolder's StarName subfolder's subfolder name. By supplying non-empty DestinationFolderSuffix you copy files to DestinationRootFolder's subfolder's subfolder: (DestinationRootFolder\StarNameSubfolder\DestinationFolderSuffix\).
 
 ___
 ### copy-files-subfolders-to-subfolders.WSF
-**CopyFilesSubfoldersToSubfolders (SourceRootFolder, DestinationRootFolder, DestinationFolderSuffix,**
+**CopyFilesSubfoldersToSubfolders (SourceRootFolder, SourceFolderSuffix, DestinationRootFolder, DestinationFolderSuffix,**
 **Extension, SearchString, OldString, NewString, DestinationFilenamePrefix, Overwrite)**
 
 Copies files with Extension and SearchString in file names from SourceRootFolder's subfolders to DestinationRootFolder's subfolders **using StarNames** as destination subfolder's names. StarName is derived from file name, as the last underscore delimited token.
 >Arguments:  
 **SourceFolder** - Single folder containing files to be copied.  
+**SourceFolderSuffix** - SourceRootFolder's any subfolder's subfolder name. By supplying non-empty SourceFolderSuffix you copy files from SourceRootFolder's subfolder's subfolder: (SourceRootFolder\AnySubfolder\SourceFolderSuffix\).  
 **DestinationRootFolder** - Destination folder. Files will be copied to subfolders named after StarNames derived from file name.  
-**DestinationFolderSuffix** - DestinationRootFolder's StarName subfolder's subfolder name. By supplying non-empty DestinationFolderSuffix you copy files to DestinationRootFolder's subfolder's subfolder: (DestinationRootFolder\StarName\DestinationFolderSuffix\).
+**DestinationFolderSuffix** - DestinationRootFolder's StarName subfolder's subfolder name. By supplying non-empty DestinationFolderSuffix you copy files to DestinationRootFolder's subfolder's subfolder: (DestinationRootFolder\StarNameSubfolder\DestinationFolderSuffix\).
 
 ___
 ### move-files-folder-to-folder.WSF
@@ -83,12 +85,13 @@ Moves files with Extension and SearchString in file names from SourceFolder to D
 
 ___
 ### move-files-subfolders-to-folder.WSF
-**MoveFilesSubfoldersToFolder (SourceRootFolder, DestinationFolder,**
+**MoveFilesSubfoldersToFolder (SourceRootFolder, SourceFolderSuffix, DestinationFolder,**
 **Extension, SearchString, OldString, NewString, DestinationFilenamePrefix, Overwrite)**
 
 Moves files with Extension and SearchString in file names from SourceRootFolder's subfolders to DestinationFolder.
 >Arguments:  
 **SourceRootFolder** - Folder with subfolders containing files to be moved.  
+**SourceFolderSuffix** - SourceRootFolder's any subfolder's subfolder name. By supplying non-empty SourceFolderSuffix you move files from SourceRootFolder's subfolder's subfolder: (SourceRootFolder\AnySubfolder\SourceFolderSuffix\).  
 **DestinationFolder** - Single destination folder.
 
 ___
@@ -100,18 +103,19 @@ Moves files with Extension and SearchString in file names from SourceFolder to D
 >Arguments:  
 **SourceFolder** - Single folder containing files to be moved.  
 **DestinationRootFolder** - Destination folder. Files will be moved to subfolders named after StarNames derived from file name.  
-**DestinationFolderSuffix** - DestinationRootFolder's StarName subfolder's subfolder name. By supplying non-empty DestinationFolderSuffix you move files to DestinationRootFolder's subfolder's subfolder: (DestinationRootFolder\StarName\DestinationFolderSuffix\).
+**DestinationFolderSuffix** - DestinationRootFolder's StarName subfolder's subfolder name. By supplying non-empty DestinationFolderSuffix you move files to DestinationRootFolder's subfolder's subfolder: (DestinationRootFolder\StarNameSubfolder\DestinationFolderSuffix\).
 
 ___
 ### move-files-subfolders-to-subfolders.WSF
-**MoveFilesSubfoldersToSubfolders (SourceRootFolder, DestinationRootFolder, DestinationFolderSuffix,**
+**MoveFilesSubfoldersToSubfolders (SourceRootFolder, SourceFolderSuffix, DestinationRootFolder, DestinationFolderSuffix,**
 **Extension, SearchString, OldString, NewString, DestinationFilenamePrefix, Overwrite)**
 
 Moves files with Extension and SearchString in file names from SourceRootFolder's subfolders to DestinationRootFolder's subfolders **using StarNames** as subfolder's names. StarName is derived from file name, as the last underscore delimited token.
 >Arguments:  
-**SourceFolder** - Single folder containing files to be moved.  
+**SourceRootFolder** - Folder with subfolders containing files to be moved.  
+**SourceFolderSuffix** - SourceRootFolder's any subfolder's subfolder name. By supplying non-empty SourceFolderSuffix you move files from SourceRootFolder's subfolder's subfolder: (SourceRootFolder\AnySubfolder\SourceFolderSuffix\).  
 **DestinationRootFolder** - Destination folder. Files will be moved to subfolders named after StarNames derived from file name.  
-**DestinationFolderSuffix** - DestinationRootFolder's StarName subfolder's subfolder name. By supplying non-empty DestinationFolderSuffix you movefiles to DestinationRootFolder's subfolder's subfolder: (DestinationRootFolder\StarName\DestinationFolderSuffix\).
+**DestinationFolderSuffix** - DestinationRootFolder's StarName subfolder's subfolder name. By supplying non-empty DestinationFolderSuffix you move files to DestinationRootFolder's subfolder's subfolder: (DestinationRootFolder\StarNameSubfolder\DestinationFolderSuffix\).
 
 ___
 ### delete-files-from-folder.WSF
@@ -135,7 +139,7 @@ ___
 
 Deletes subfolders of RootFolder that do not contain files.
 >Arguments:  
-**RootFolder** - Folder with subfolders to be deleted.
+**RootFolder** - Folder with empty subfolders to be deleted.
 
 ___
 ### rename-files-in-folder.WSF
@@ -159,7 +163,7 @@ ___
 
 Returns number of files with Extension and SearchString in file names, in Folder.
 >Arguments:  
-**Folder** - Single folder containing files to be renamed.
+**Folder** - Single folder containing files to be counted.
 
 ___
 ### count-files-in-subfolders.WSF
@@ -167,19 +171,19 @@ ___
 
 Returns number of files with Extension and SearchString in file names, in subfolders of RootFolder.
 >Arguments:  
-**RootFolder** - Folder with subfolders containing files to be renamed.
+**RootFolder** - Folder with subfolders containing files to be counted.
 
 ___
-### star-name.vbs
+### star-name
 **Function StarName(FileName, Extension)**
 
-Returns StarName as last undescore delimited token in FileName.
+Returns StarName string: last undescore delimited token in FileName. Result is used to name DestinationRootFolder's subfolder. Function StarName resides in  files-tools-LIB.vbs
 >Function StarName(FileName, Extension)  
 ' For FileName: "SFDB_2016-02-03_1917-29_J000703_BMAH__V_1x1_0040s_HIP 110893.fit"  
 ' returns star name: "HIP 110893"  
-    Dim t  
-    t = Split(Left(FN, Len(FN) - (Len(Extension) + 1)), "_")  
-    StarName = t(Ubound(t)) & "\"  
+  Dim t  
+  t = Split(Left(FN, Len(FN) - (Len(Extension) + 1)), "_")  
+  StarName = t(Ubound(t)) & "\"  
 End Function
 
 ___

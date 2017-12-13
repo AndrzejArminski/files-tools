@@ -1,7 +1,10 @@
 Option Explicit
 
-' TODO: show WelcomeMessage output in logfile
-' TODO: in scripts "copy/move-form-subfolders-to-*.WSF" add argument SrcFolderSuffix
+' TODO: Implement data entry syntax:
+' copy|move F:\OneDrive\AstroProjects\test\SKY\<AnyFolder>\03\Cas?sss^ttt.txt F:\OneDrive\AstroProjects\test\SKY\<StarNameFolder>\01\
+' delete|rename F:\OneDrive\AstroProjects\test\SKY\<AnyFolder>\01\stars?sss^ttt.txt   <--- allow Suffix "01\"  !
+' delete F:\OneDrive\AstroProjects\test\SKY\<EmptyFolder>\
+
 
 ' files-tools-LIB.vbs
 ' Library for copying, moving, deleting and renaming multiple files.
@@ -31,9 +34,11 @@ Option Explicit
 ' SrcFolder			- Source folder
 ' DstFolder 		- Destination folder
 ' SrcRootFolder		- Root folder for source subolders
+' SrcFolderSuffix	- "01\", example: "F:\SKY\AA And\01\" (RootFolder\AnySubfolder\FolderSuffix\)
+' 						By supplying non-empty DstFolderSuffix you copy/move files from SrcRootFolder's subfolder's subfolder.
 ' DstRootFolder 	- Root folder for destination subolders
-' DstFolderSuffix	- "01\", example: "F:\SKY\AA And\01\" (RootFolder\SubFolder\DstFolderSuffix\)
-' 						By supplying non-empty DstFolderSuffix you move files to DstFolder's subfolder.
+' DstFolderSuffix	- "01\", example: "F:\SKY\AA And\01\" (RootFolder\StarName\FolderSuffix\)
+' 						By supplying non-empty DstFolderSuffix you copy/move files to DstRootFolder's StarName-subfolder's subfolder.
 ' DstFilenamePrefix	- DstFilenamePrefix is attached at the begining of destination filenames. Example: "S_" , "S_7865-4565.fit"
 ' Extension			- Only files with this extension will be moved or copied
 ' SearchStr 		- Only files with SearchStr within filename will be moved or copied
@@ -110,9 +115,11 @@ Sub OpenLogFile(Folder)
 End Sub
 
 Sub WelcomeMessage(Moving, FromSingleFolder, ToSingleFolder, _
-					SrcFolder, DstFolder, DstFolderSuffix, DstFilenamePrefix, Extension, SearchStr, oldStr, newStr, overWrite)
+					SrcFolder, SrcFolderSuffix, DstFolder, DstFolderSuffix, DstFilenamePrefix, Extension, SearchStr, oldStr, newStr, overWrite)
 ' Input: Moving, FromSingleFolder, ToSingleFolder As Boolean
 	Dim title, s, Renaming
+	
+	OpenLogFile DstFolder
 	
 	Renaming = Moving And (FromSingleFolder = ToSingleFolder) And (SrcFolder = DstFolder)
 	If Renaming Then
@@ -143,17 +150,14 @@ Sub WelcomeMessage(Moving, FromSingleFolder, ToSingleFolder, _
 			s = s & vbNewLine & vbNewLine & "from folder " & SrcFolder
 			title = title & "Folder To "
 		Else
-			s = s & vbNewLine & vbNewLine & "from subfolders of folder " & SrcFolder
+			s = s & vbNewLine & vbNewLine & "from subfolders: " & SrcFolder & "<AnyFolder>\" & SrcFolderSuffix
 			title = title & "Subfolders To "
 		End If
-	End If
-	
-	If Not Renaming Then
 		If ToSingleFolder Then
-			s = s & vbNewLine & vbNewLine & "to folder " & DstFolder & DstFolderSuffix
+			s = s & vbNewLine & vbNewLine & "to folder " & DstFolder 
 			title = title & "Folder"
 		Else
-			s = s & vbNewLine & vbNewLine & "to subfolders of folder " & DstFolder & DstFolderSuffix
+			s = s & vbNewLine & vbNewLine & "to subfolders: " & DstFolder & "<StarNameFolder>\" & DstFolderSuffix
 			title = title & "Subfolders"
 		End If
 	End If
@@ -162,6 +166,7 @@ Sub WelcomeMessage(Moving, FromSingleFolder, ToSingleFolder, _
 		s = s & vbNewLine & vbNewLine & "The substring "  & """" & DstFilenamePrefix & """" & " to be attached at the begining of destination file names."
 	If Len(oldStr) > 0 Then s = s & vbNewLine & vbNewLine & "The substring " & """" & oldStr & """" & " to be replaced with substring " & """" & newStr & """" & " in destination file names."
 	
+	logfile.WriteLine s
 	s = s & vbNewLine & vbNewLine & "Do you want to proceed?"
 	
 	If vbNo = MsgBox(s, vbYesNo, title) Then 
@@ -234,9 +239,8 @@ Sub CopyFilesFolderToFolder(SrcFolder, DstFolder, DstFilenamePrefix, Extension, 
 	Set oFSO = CreateObject("Scripting.FileSystemObject")
 	SrcFolder = FolderNameWithSlash(SrcFolder)
 	DstFolder = FolderNameWithSlash(DstFolder)
-	WelcomeMessage False, True, True, SrcFolder, DstFolder, "", DstFilenamePrefix, Extension, SearchStr, oldStr, newStr, overWrite
+	WelcomeMessage False, True, True, SrcFolder, "", DstFolder, "", DstFilenamePrefix, Extension, SearchStr, oldStr, newStr, overWrite
 	If oFSO.FolderExists(SrcFolder) Then
-		OpenLogFile DstFolder
 		CopyFiles SrcFolder, DstFolder, "", DstFilenamePrefix, Extension, SearchStr, oldStr, newStr, overWrite, False
 		Summary False, True, True, SrcFolder, DstFolder, Extension, SearchStr
 	Else
@@ -246,17 +250,21 @@ Sub CopyFilesFolderToFolder(SrcFolder, DstFolder, DstFilenamePrefix, Extension, 
 End Sub
 
 ' copy-files-subfolders-to-folder
-Sub CopyFilesSubfoldersToFolder(SrcRootFolder, DstFolder, DstFilenamePrefix, Extension, SearchStr, oldStr, newStr, overWrite)
+Sub CopyFilesSubfoldersToFolder(SrcRootFolder, SrcFolderSuffix, DstFolder, DstFilenamePrefix, Extension, SearchStr, oldStr, newStr, overWrite)
 ' Copies files with Extension and SearchStr in filenames from SrcRootFolder's subfolders to DstFolder.
 	Dim d
 	Set oFSO = CreateObject("Scripting.FileSystemObject")
 	SrcRootFolder = FolderNameWithSlash(SrcRootFolder)
+	SrcFolderSuffix = FolderNameWithSlash(SrcFolderSuffix)
 	DstFolder = FolderNameWithSlash(DstFolder)
-	WelcomeMessage False, False, True, SrcRootFolder, DstFolder, "", DstFilenamePrefix, Extension, SearchStr, oldStr, newStr, overWrite
+	WelcomeMessage False, False, True, SrcRootFolder, SrcFolderSuffix, DstFolder, "", DstFilenamePrefix, Extension, SearchStr, oldStr, newStr, overWrite
 	If oFSO.FolderExists(SrcRootFolder) Then
-		OpenLogFile DstFolder
 		For Each d In oFSO.GetFolder(SrcRootFolder).SubFolders
-			CopyFiles d.Path & "\", DstFolder, "", DstFilenamePrefix, Extension, SearchStr, oldStr, newStr, overWrite, False
+			If oFSO.FolderExists(d.Path & "\" & SrcFolderSuffix) Then
+				CopyFiles d.Path & "\" & SrcFolderSuffix, DstFolder, "", DstFilenamePrefix, Extension, SearchStr, oldStr, newStr, overWrite, False
+			Else
+				logfile.WriteLine "Source folder does not exist: " & d.Path & "\" & SrcFolderSuffix
+			End If
 		Next
 		Summary False, False, True, SrcRootFolder, DstFolder, Extension, SearchStr
 	Else
@@ -273,9 +281,8 @@ Sub CopyFilesFolderToSubfolders(SrcFolder, DstRootFolder, DstFolderSuffix, DstFi
 	SrcFolder = FolderNameWithSlash(SrcFolder)
 	DstRootFolder = FolderNameWithSlash(DstRootFolder)
 	DstFolderSuffix = FolderNameWithSlash(DstFolderSuffix)
-	WelcomeMessage False, True, False, SrcFolder, DstRootFolder, DstFolderSuffix, DstFilenamePrefix, Extension, SearchStr, oldStr, newStr, overWrite
+	WelcomeMessage False, True, False, SrcFolder, "", DstRootFolder, DstFolderSuffix, DstFilenamePrefix, Extension, SearchStr, oldStr, newStr, overWrite
 	If oFSO.FolderExists(SrcFolder) Then
-		OpenLogFile DstRootFolder
 		CopyFiles SrcFolder, DstRootFolder, DstFolderSuffix, DstFilenamePrefix, Extension, SearchStr, oldStr, newStr, overWrite, True
 		Summary False, True, False, SrcFolder, DstRootFolder, Extension, SearchStr
 	Else
@@ -285,18 +292,22 @@ Sub CopyFilesFolderToSubfolders(SrcFolder, DstRootFolder, DstFolderSuffix, DstFi
 End Sub
 
 ' copy-files-subfolders-to-subfolders
-Sub CopyFilesSubfoldersToSubfolders(SrcRootFolder, DstRootFolder, DstFolderSuffix, DstFilenamePrefix, Extension, SearchStr, oldStr, newStr, overWrite)
+Sub CopyFilesSubfoldersToSubfolders(SrcRootFolder, SrcFolderSuffix, DstRootFolder, DstFolderSuffix, DstFilenamePrefix, Extension, SearchStr, oldStr, newStr, overWrite)
 ' Copies files with Extension and SearchStr in filenames from SrcRootFolder's subfolders to DstRootFolder's subfolders using StarNames as subfolder's names.
 	Dim d
 	Set oFSO = CreateObject("Scripting.FileSystemObject")
 	SrcRootFolder = FolderNameWithSlash(SrcRootFolder)
+	SrcFolderSuffix = FolderNameWithSlash(SrcFolderSuffix)
 	DstRootFolder = FolderNameWithSlash(DstRootFolder)
 	DstFolderSuffix = FolderNameWithSlash(DstFolderSuffix)
-	WelcomeMessage False, False, False, SrcRootFolder, DstRootFolder, DstFolderSuffix, DstFilenamePrefix, Extension, SearchStr, oldStr, newStr, overWrite
+	WelcomeMessage False, False, False, SrcRootFolder, SrcFolderSuffix, DstRootFolder, DstFolderSuffix, DstFilenamePrefix, Extension, SearchStr, oldStr, newStr, overWrite
 	If oFSO.FolderExists(SrcRootFolder) Then
-		OpenLogFile DstRootFolder
 		For Each d In oFSO.GetFolder(SrcRootFolder).SubFolders
-			CopyFiles d.Path & "\", DstRootFolder, DstFolderSuffix, DstFilenamePrefix, Extension, SearchStr, oldStr, newStr, overWrite, True
+			If oFSO.FolderExists(d.Path & "\" & SrcFolderSuffix) Then
+				CopyFiles d.Path & "\" & SrcFolderSuffix, DstRootFolder, DstFolderSuffix, DstFilenamePrefix, Extension, SearchStr, oldStr, newStr, overWrite, True
+			Else
+				logfile.WriteLine "Source folder does not exist: " & d.Path & "\" & SrcFolderSuffix
+			End If
 		Next
 		Summary False, False, False, SrcRootFolder, DstRootFolder, Extension, SearchStr
 	Else
@@ -311,10 +322,10 @@ Sub MoveFilesFolderToFolder(SrcFolder, DstFolder, DstFilenamePrefix, Extension, 
 ' Moves files with Extension and SearchStr in filenames from SrcFolder to DstFolder.
 	Set oFSO = CreateObject("Scripting.FileSystemObject")
 	SrcFolder = FolderNameWithSlash(SrcFolder)
+	SrcFolderSuffix = FolderNameWithSlash(SrcFolderSuffix)
 	DstFolder = FolderNameWithSlash(DstFolder)
-	WelcomeMessage True, True, True, SrcFolder, DstFolder, "", DstFilenamePrefix, Extension, SearchStr, oldStr, newStr, overWrite
+	WelcomeMessage True, True, True, SrcFolder, "", DstFolder, "", DstFilenamePrefix, Extension, SearchStr, oldStr, newStr, overWrite
 	If oFSO.FolderExists(SrcFolder) Then
-		OpenLogFile DstFolder
 		MoveFiles SrcFolder, DstFolder, "", DstFilenamePrefix, Extension, SearchStr, oldStr, newStr, overWrite, False
 		Summary True, True, True, SrcFolder, DstFolder, Extension, SearchStr
 	Else
@@ -324,17 +335,21 @@ Sub MoveFilesFolderToFolder(SrcFolder, DstFolder, DstFilenamePrefix, Extension, 
 End Sub
 
 ' move-files-subfolders-to-folder
-Sub MoveFilesSubfoldersToFolder(SrcRootFolder, DstFolder, DstFilenamePrefix, Extension, SearchStr, oldStr, newStr, overWrite)
+Sub MoveFilesSubfoldersToFolder(SrcRootFolder, SrcFolderSuffix, DstFolder, DstFilenamePrefix, Extension, SearchStr, oldStr, newStr, overWrite)
 ' Moves files with Extension and SearchStr in filenames from SrcRootFolder's subfolders to DstFolder.
 	Dim d
 	Set oFSO = CreateObject("Scripting.FileSystemObject")
 	SrcRootFolder = FolderNameWithSlash(SrcRootFolder)
+	SrcFolderSuffix = FolderNameWithSlash(SrcFolderSuffix)
 	DstFolder = FolderNameWithSlash(DstFolder)
-	WelcomeMessage True, False, True, SrcRootFolder, DstFolder, "", DstFilenamePrefix, Extension, SearchStr, oldStr, newStr, overWrite
+	WelcomeMessage True, False, True, SrcRootFolder, SrcFolderSuffix, DstFolder, "", DstFilenamePrefix, Extension, SearchStr, oldStr, newStr, overWrite
 	If oFSO.FolderExists(SrcRootFolder) Then
-		OpenLogFile DstFolder
 		For Each d In oFSO.GetFolder(SrcRootFolder).SubFolders
-			MoveFiles d.Path & "\", DstFolder, "", DstFilenamePrefix, Extension, SearchStr, oldStr, newStr, overWrite, False
+			If oFSO.FolderExists(d.Path & "\" & SrcFolderSuffix) Then
+				MoveFiles d.Path & "\" & SrcFolderSuffix, DstFolder, "", DstFilenamePrefix, Extension, SearchStr, oldStr, newStr, overWrite, False
+			Else
+				logfile.WriteLine "Source folder does not exist: " & d.Path & "\" & SrcFolderSuffix
+			End If
 		Next
 		Summary True, False, True, SrcRootFolder, DstFolder, Extension, SearchStr
 	Else
@@ -351,9 +366,8 @@ Sub MoveFilesFolderToSubfolders(SrcFolder, DstRootFolder, DstFolderSuffix, DstFi
 	SrcFolder = FolderNameWithSlash(SrcFolder)
 	DstRootFolder = FolderNameWithSlash(DstRootFolder)
 	DstFolderSuffix = FolderNameWithSlash(DstFolderSuffix)
-	WelcomeMessage True, True, False, SrcFolder, DstRootFolder, DstFolderSuffix, DstFilenamePrefix, Extension, SearchStr, oldStr, newStr, overWrite
+	WelcomeMessage True, True, False, SrcFolder, "", DstRootFolder, DstFolderSuffix, DstFilenamePrefix, Extension, SearchStr, oldStr, newStr, overWrite
 	If oFSO.FolderExists(SrcFolder) Then
-		OpenLogFile DstRootFolder
 		MoveFiles SrcFolder, DstRootFolder, DstFolderSuffix, DstFilenamePrefix, Extension, SearchStr, oldStr, newStr, overWrite, True
 		Summary True, True, False, SrcFolder, DstRootFolder, Extension, SearchStr
 	Else
@@ -364,22 +378,26 @@ End Sub
 
 ' move-files-subfolders-to-subfolders
 ' rename-files-in-subfolders
-Sub MoveFilesSubfoldersToSubfolders(SrcRootFolder, DstRootFolder, DstFolderSuffix, DstFilenamePrefix, Extension, SearchStr, oldStr, newStr, overWrite)
+Sub MoveFilesSubfoldersToSubfolders(SrcRootFolder, SrcFolderSuffix, DstRootFolder, DstFolderSuffix, DstFilenamePrefix, Extension, SearchStr, oldStr, newStr, overWrite)
 ' Moves files with Extension and SearchStr in filenames from SrcRootFolder's subfolders to DstRootFolder's subfolders using StarNames as subfolder's names.
 	Dim d, Rename
 	Set oFSO = CreateObject("Scripting.FileSystemObject")
 	SrcRootFolder = FolderNameWithSlash(SrcRootFolder)
+	SrcFolderSuffix = FolderNameWithSlash(SrcFolderSuffix)
 	DstRootFolder = FolderNameWithSlash(DstRootFolder)
 	DstFolderSuffix = FolderNameWithSlash(DstFolderSuffix)
-	Rename = (SrcRootFolder = DstRootFolder)
-	WelcomeMessage True, False, False, SrcRootFolder, DstRootFolder, DstFolderSuffix, DstFilenamePrefix, Extension, SearchStr, oldStr, newStr, overWrite
+	Rename = (SrcRootFolder = DstRootFolder) And Len(SrcFolderSuffix) = 0 And Len(DstFolderSuffix) = 0
+	WelcomeMessage True, False, False, SrcRootFolder, SrcFolderSuffix, DstRootFolder, DstFolderSuffix, DstFilenamePrefix, Extension, SearchStr, oldStr, newStr, overWrite
 	If oFSO.FolderExists(SrcRootFolder) Then
-		OpenLogFile DstRootFolder
 		For Each d In oFSO.GetFolder(SrcRootFolder).SubFolders
 			If Rename Then 
 				MoveFiles d.Path & "\", d.Path & "\", "", DstFilenamePrefix, Extension, SearchStr, oldStr, newStr, overWrite, False
 			Else
-				MoveFiles d.Path & "\", DstRootFolder, DstFolderSuffix, DstFilenamePrefix, Extension, SearchStr, oldStr, newStr, overWrite, True
+				If oFSO.FolderExists(d.Path & "\" & SrcFolderSuffix) Then
+					MoveFiles d.Path & "\" & SrcFolderSuffix, DstRootFolder, DstFolderSuffix, DstFilenamePrefix, Extension, SearchStr, oldStr, newStr, overWrite, True
+				Else
+					logfile.WriteLine " Source folder does not exists: " & d.Path & "\" & SrcFolderSuffix
+				End If
 			End If
 		Next
 		Summary True, False, False, SrcRootFolder, DstRootFolder, Extension, SearchStr
@@ -530,7 +548,6 @@ Sub CopyFiles(SrcFolder, DstFolder, DstFolderSuffix, DstFilenamePrefix, Extensio
 	Else
 		folder_exists = FolderExists(DstFolder)
 	End If
-
 	If folder_exists Then
 		For Each f In oFSO.GetFolder(SrcFolder).Files
 			If StrComp(oFSO.GetExtensionName(f), Extension) = 0 Then

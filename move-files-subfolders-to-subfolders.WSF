@@ -11,7 +11,11 @@
 		Option Explicit
 		Const SourceRootFolder = "F:\OneDrive\AstroProjects\test\SKY\"   ' Folder with subfolders containing files to be moved.
 		Const Extension = "txt"		' Only files with this Extension will be moved. No wildcards. Required.
-		Const SearchString = "_"	' Only files with SearchString within filename will be moved. Give empty string to move all files.
+		Const SearchString = "AA"	' Only files with SearchString within filename will be moved. Give empty string to move all files.
+		
+		' By supplying non-empty SourceFolderSuffix you move files from SourceRootFolder's subfolder's subfolder: (SourceRootFolder\AnySubfolder\SourceFolderSuffix\).
+		' Example: set "01\" to move from "F:\OneDrive\AstroProjects\test\SKY\57456\01\" 
+		Const SourceFolderSuffix = "03\"	' "01\"
 
 		Const DestinationRootFolder = "F:\OneDrive\AstroProjects\test\STARS\"    ' Destination root folder.
 		' Files will be moved to DestinationRootFolder's subfolders named after StarNames derived from file name.
@@ -28,7 +32,7 @@
 		Const OldString = "_"		' OldString may be empty to ignore.
 		Const NewString = "_V_"
 		
-		MoveFilesSubfoldersToSubfolders SourceRootFolder, DestinationRootFolder, DestinationFolderSuffix, DestinationFilenamePrefix, Extension, SearchString, OldString, NewString, overWrite
+		MoveFilesSubfoldersToSubfolders SourceRootFolder, SourceFolderSuffix, DestinationRootFolder, DestinationFolderSuffix, DestinationFilenamePrefix, Extension, SearchString, OldString, NewString, overWrite
 	
 	</script>
 </job>
