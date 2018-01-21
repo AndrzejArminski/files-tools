@@ -1,11 +1,5 @@
 Option Explicit
 
-' TODO: Implement data entry syntax:
-' copy|move F:\OneDrive\AstroProjects\test\SKY\<AnyFolder>\03\Cas?sss^ttt.txt F:\OneDrive\AstroProjects\test\SKY\<StarNameFolder>\01\
-' delete|rename F:\OneDrive\AstroProjects\test\SKY\<AnyFolder>\01\stars?sss^ttt.txt   <--- allow Suffix "01\"  !
-' delete F:\OneDrive\AstroProjects\test\SKY\<EmptyFolder>\
-
-
 ' files-tools-LIB.vbs
 ' Library for copying, moving, deleting and renaming multiple files.
 '-------------------------------------------------------------------
@@ -55,8 +49,13 @@ Option Explicit
 	moved_copied = 0	' Number of moved or copied files
 	replaced = 0		' Number of overwritten files
 	skipped = 0			' Number of skiped files because filename does not contain SearchStr
-	alreadyExists = 0	' Number of files that were not moved as already existed in DstFolder
+	alreadyExists = 0	' Number of files that were not moved as already had existed in DstFolder
 	first = True
+
+Sub ErrMsg(str)
+	MsgBox str & vbNewLine & vbNewLine & "Script aborted.", vbOK, "Error Message"
+	WScript.Quit
+End Sub
 
 Function StarName(FN, Extension)
 ' Extracts star name from last token of file name FN
@@ -225,7 +224,7 @@ Sub Summary(Moving, FromSingleFolder, ToSingleFolder, SrcFolder, DstFolder, Exte
 		s = s & DstFolder
 	End If
 	
-	If alreadyExists > 0 Then s = s & vbNewLine & vbNewLine & alreadyExists & " *." & Extension & " files were NOT copied/moved/renamed as already existed in destination folder(s)"
+	If alreadyExists > 0 Then s = s & vbNewLine & vbNewLine & alreadyExists & " *." & Extension & " files were NOT copied/moved/renamed as already had existed in destination folder(s)."
 	If skipped > 0 Then s = s & vbNewLine & vbNewLine & skipped & " *." & Extension & " files were skipped, as did not contain string: "  & """" & SearchStr & """"
 	logfile.WriteLine vbNewLine & s
 	logfile.Close
@@ -322,7 +321,6 @@ Sub MoveFilesFolderToFolder(SrcFolder, DstFolder, DstFilenamePrefix, Extension, 
 ' Moves files with Extension and SearchStr in filenames from SrcFolder to DstFolder.
 	Set oFSO = CreateObject("Scripting.FileSystemObject")
 	SrcFolder = FolderNameWithSlash(SrcFolder)
-	SrcFolderSuffix = FolderNameWithSlash(SrcFolderSuffix)
 	DstFolder = FolderNameWithSlash(DstFolder)
 	WelcomeMessage True, True, True, SrcFolder, "", DstFolder, "", DstFilenamePrefix, Extension, SearchStr, oldStr, newStr, overWrite
 	If oFSO.FolderExists(SrcFolder) Then
@@ -380,23 +378,25 @@ End Sub
 ' rename-files-in-subfolders
 Sub MoveFilesSubfoldersToSubfolders(SrcRootFolder, SrcFolderSuffix, DstRootFolder, DstFolderSuffix, DstFilenamePrefix, Extension, SearchStr, oldStr, newStr, overWrite)
 ' Moves files with Extension and SearchStr in filenames from SrcRootFolder's subfolders to DstRootFolder's subfolders using StarNames as subfolder's names.
-	Dim d, Rename
+' Renames files with Extension and SearchStr in filenames in SrcRootFolder's subfolders.
+	Dim d, Rename, path
 	Set oFSO = CreateObject("Scripting.FileSystemObject")
 	SrcRootFolder = FolderNameWithSlash(SrcRootFolder)
 	SrcFolderSuffix = FolderNameWithSlash(SrcFolderSuffix)
 	DstRootFolder = FolderNameWithSlash(DstRootFolder)
 	DstFolderSuffix = FolderNameWithSlash(DstFolderSuffix)
-	Rename = (SrcRootFolder = DstRootFolder) And Len(SrcFolderSuffix) = 0 And Len(DstFolderSuffix) = 0
+	Rename = (SrcRootFolder = DstRootFolder) And StrComp(SrcFolderSuffix, DstFolderSuffix) = 0
 	WelcomeMessage True, False, False, SrcRootFolder, SrcFolderSuffix, DstRootFolder, DstFolderSuffix, DstFilenamePrefix, Extension, SearchStr, oldStr, newStr, overWrite
 	If oFSO.FolderExists(SrcRootFolder) Then
 		For Each d In oFSO.GetFolder(SrcRootFolder).SubFolders
-			If Rename Then 
-				MoveFiles d.Path & "\", d.Path & "\", "", DstFilenamePrefix, Extension, SearchStr, oldStr, newStr, overWrite, False
+			path = d.Path & "\" & SrcFolderSuffix
+			If Rename Then
+				If oFSO.FolderExists(path) Then MoveFiles path, path, "", DstFilenamePrefix, Extension, SearchStr, oldStr, newStr, overWrite, False
 			Else
-				If oFSO.FolderExists(d.Path & "\" & SrcFolderSuffix) Then
-					MoveFiles d.Path & "\" & SrcFolderSuffix, DstRootFolder, DstFolderSuffix, DstFilenamePrefix, Extension, SearchStr, oldStr, newStr, overWrite, True
+				If oFSO.FolderExists(path) Then
+					MoveFiles path, DstRootFolder, DstFolderSuffix, DstFilenamePrefix, Extension, SearchStr, oldStr, newStr, overWrite, True
 				Else
-					logfile.WriteLine " Source folder does not exists: " & d.Path & "\" & SrcFolderSuffix
+					logfile.WriteLine " Source folder does not exists: " & path
 				End If
 			End If
 		Next
@@ -462,13 +462,17 @@ End Sub
 
 ' delete-files-from-subfolders
 ' count-files-in-subfolders
-Sub DeleteFilesFromSubfolders(RootFolder, Extension, SearchStr, DoDelete)
+Sub DeleteFilesFromSubfolders(RootFolder, FolderSuffix, Extension, SearchStr, DoDelete)
 ' Deletes or counts files with Extension and SearchStr in filenames, in all subfolders of RootFolder.
 	Dim d, f, Folder, FN, ss, count, str, action
 	RootFolder = FolderNameWithSlash(RootFolder)
 	If DoDelete Then
 		action = "delete: "
-		str = "Files in all subfolders of folder " & RootFolder & vbNewLine & "with extension ." & Extension
+		If Len(FolderSuffix) > 0 Then
+			str = "Files in all folders " & RootFolder & "<AnyFolder>\" & FolderSuffix & vbNewLine & "with extension ." & Extension
+		Else
+			str = "Files in all subfolders of folder " & RootFolder & vbNewLine & "with extension ." & Extension
+		End If
 		If Len(SearchStr) > 0 Then str = str & vbNewLine & "and containing string " & """" & SearchStr & """"
 		str = str & vbNewLine & vbNewLine & "will be permanently deleted!" & vbNewLine & vbNewLine & "Do you realy want to proceed?" 
 		If vbNo = MsgBox(str, vbYesNo, "Delete Files") Then
@@ -477,7 +481,11 @@ Sub DeleteFilesFromSubfolders(RootFolder, Extension, SearchStr, DoDelete)
 		End If
 	Else
 		action = "count: "
-		str = "Count files in all subfolders of folder " & RootFolder & vbNewLine & "with extension ." & Extension
+		If Len(FolderSuffix) > 0 Then
+			str = "Count files in all subfolders: " & RootFolder & "<AndFolder>\" & FolderSuffix & vbNewLine & " having extension ." & Extension
+		Else
+			str = "Count files in all subfolders of folder " & RootFolder & vbNewLine & "with extension ." & Extension
+		End If
 		If Len(SearchStr) > 0 Then str = str & vbNewLine & "and containing string " & """" & SearchStr & """" & "."
 		MsgBox str, vbOK, "Count Files"
 	End If
@@ -488,7 +496,8 @@ Sub DeleteFilesFromSubfolders(RootFolder, Extension, SearchStr, DoDelete)
 		count = 0
 		For Each d In oFSO.GetFolder(RootFolder).SubFolders
 			Folder = RootFolder & d.Name & "\"
-			For Each f In d.Files
+			If Len(FolderSuffix) > 0 Then Folder = Folder & FolderSuffix & "\"
+			For Each f In oFSO.GetFolder(Folder).Files
 				If StrComp(oFSO.GetExtensionName(f), Extension) = 0 Then
 					FN = oFSO.GetFileName(f)
 					ss = Len(SearchStr) = 0 Or InStr(FN, SearchStr) > 0
@@ -503,9 +512,17 @@ Sub DeleteFilesFromSubfolders(RootFolder, Extension, SearchStr, DoDelete)
 		OpenLogFile RootFolder
 		logfile.WriteLine str
 		If DoDelete Then
-			str = vbNewLine & "All done:" & vbNewLine & vbNewLine & count & " files deleted from subfolders of " & RootFolder
+			If Len(FolderSuffix) > 0 Then
+				str = vbNewLine & "All done:" & vbNewLine & vbNewLine & count & " files deleted from folders: " & RootFolder & "<AnyFolder>\" & FolderSuffix
+			Else
+				str = vbNewLine & "All done:" & vbNewLine & vbNewLine & count & " files deleted from subfolders of " & RootFolder
+			End If
 		Else
-			str = vbNewLine & "All done:" & vbNewLine & vbNewLine & "There are " & count & " matching files in subfolders of " & RootFolder
+			If Len(FolderSuffix) > 0 Then
+				str = vbNewLine & "All done:" & vbNewLine & vbNewLine & "There are " & count & " matching files in folders: " & RootFolder & "<AnyFolder>\" & FolderSuffix
+			Else
+				str = vbNewLine & "All done:" & vbNewLine & vbNewLine & "There are " & count & " matching files in subfolders of " & RootFolder
+			End If
 		End If
 		logfile.WriteLine str
 		logfile.Close
@@ -710,4 +727,215 @@ Sub DeleteEmptySubfolders(RootFolder)
 	Else
 		WScript.Echo "Folder does not exist: " & RootFolder
 	End If
+End Sub
+
+' copy|move|copyOverwrite|moveOverwrite F:\SrcFolder\<AnyFolder>\SrcFolderSuffix\SearchStr^OldStr.Ext F:\DstFolder\<StarNameFolder>\DstFolderSuffix\FNPrefix^NewStr
+' rename F:\Folder\<AnyFolder>\FolderSuffix\SearchStr^OldStr^NewStr.txt
+' delete|count F:\Folder\<AnyFolder>\FolderSuffix\SearchStr.txt
+
+' copy|move\copyOverwrite|moveOverwrite F:\OneDrive\AstroProjects\test\SKY\<AnyFolder>\03\SearchStr^OldStr.txt F:\OneDrive\AstroProjects\test\SKY\<StarNameFolder>\01\FNPrefix^NewStr
+' rename F:\OneDrive\AstroProjects\test\SKY\<AnyFolder>\01\SearchStr^OldStr^NewStr.txt
+' delete|count F:\OneDrive\AstroProjects\test\SKY\<AnyFolder>\01\SearchStr.txt
+' delete F:\OneDrive\AstroProjects\test\SKY\<EmptyFolder>\
+
+Sub Parse(job)
+	Dim j, nj, command, t1, t2, nt1, nt2, p1, p2, fn1, fn2, f, ff, fff, p, pp, sx, i1, i2, jobx
+	Dim SrcFolder, SrcRootFolder, SrcFolderSuffix, DstFolder, DstRootFolder, DstFolderSuffix
+	Dim DstFilenamePrefix, Extension, SearchStr, oldStr, newStr, overWrite
+	
+	SrcFolder = ""
+	SrcRootFolder = ""
+	SrcFolderSuffix = ""
+	DstFolder = ""
+	DstRootFolder = ""
+	DstFolderSuffix = ""
+	DstFilenamePrefix = ""
+	Extension = ""
+	SearchStr = ""
+	oldStr = ""
+	newStr = ""
+	overWrite = False
+	
+	i1 = InStr(job, " ")
+	i2 = InStrRev(job, ":") - 2
+	jobx = Left(job, i1 - 1) & "?" & Right(job, Len(job) - i1)
+	If i2 > i1 Then jobx = Left(jobx, i2 - 1) & "?" & Right(jobx, Len(jobx) - i2)
+	
+	j = Split(Trim(jobx), "?")
+	nj = UBound(j)
+	command = LCase(j(0))
+	
+	' First argument
+	If Right(j(1), 1) = "\" Then j(1) = Left(j(1), Len(j(1)) - 1)	' Remove last "\" when exists
+	t1 = Split(j(1), "\")
+	nt1 = UBound(t1)
+	
+	fn1 = t1(nt1)	' file name 1
+	p1 = Left(j(1), Len(j(1)) - Len(fn1))	' path 1
+	
+	If InStr(fn1, ">") > 0 Then
+		DeleteEmptySubfolders p1
+		WScript.Quit
+	Else
+		' source filename components
+		f = Split(fn1, ".")
+		If UBound(f) = 1 Then
+			Extension = f(1)
+		Else
+			ErrMsg "Wrong extension: " & fn1
+		End If
+		
+		If InStr(f(0), "^") > 0 Then
+			ff = Split(f(0), "^")
+			SearchStr = ff(0)
+			If UBound(ff) >= 1 Then oldStr = ff(1)
+			If UBound(ff) = 2 Then newStr = ff(2)
+			If UBound(ff) > 2 Then ErrMsg "Wrong file arguments (SearchString, OldString or NewString): " & fn1
+		End If
+	End If
+	
+	' source path
+	If InStr(p1, "<") > 0 Then
+		p = Split(p1, "<")
+		SrcRootFolder = p(0)
+		pp = Split(p(1), ">")
+		If Len(pp(1)) > 1 Then
+			sx = pp(1)
+			If InStr(sx, "\") = 1 Then 
+				SrcFolderSuffix = Right(sx, Len(sx) - 1)
+			Else
+				ErrMsg "Wrong file arguments (Source Folder Suffix): " & p1
+			End If
+		End If
+	Else
+		If Right(p1, 1) <> "\" Then 
+			SrcFolder = p1 & "\"
+		Else
+			SrcFolder = p1
+		End If
+	End If
+	
+	Select Case nj
+		Case 1
+			Select Case command
+				Case "delete"
+					If Len(SrcFolder) > 0 Then
+						' delete files from folder
+						DeleteFilesFromFolder SrcFolder, Extension, SearchStr, True
+					ElseIf Len(SrcRootFolder) > 0 Then
+						' delete files from subfolders
+						DeleteFilesFromSubfolders SrcRootFolder, SrcFolderSuffix, Extension, SearchStr, True
+					Else
+						ErrMsg "Wrong Folder: " & p1
+					End If
+				Case "rename"
+					If Len(SrcFolder) > 0 Then
+						' reneme files in folder
+						MoveFilesFolderToFolder SrcFolder, SrcFolder, DstFilenamePrefix, Extension, SearchStr, oldStr, newStr, True
+					ElseIf Len(SrcRootFolder) > 0 Then
+						' rename files in subfolders
+						MoveFilesSubfoldersToSubfolders SrcRootFolder, SrcFolderSuffix, SrcRootFolder, SrcFolderSuffix, DstFilenamePrefix, Extension, SearchStr, oldStr, newStr, True
+						'MoveFilesSubfoldersToSubfolders SrcRootFolder, "", SrcRootFolder, "", DstFilenamePrefix, Extension, SearchStr, oldStr, newStr, True
+					Else
+						ErrMsg "Wrong Folder: " & p1
+					End If
+				Case "count"
+					If Len(SrcFolder) > 0 Then
+						' count files in folder
+						DeleteFilesFromFolder SrcFolder, Extension, SearchStr, False
+					ElseIf Len(SrcRootFolder) > 0 Then
+						' count files in subfolders
+						DeleteFilesFromSubfolders SrcRootFolder, SrcFolderSuffix, Extension, SearchStr, False
+					Else
+						ErrMsg "Wrong Folder: " & p1
+					End If
+				Case Else
+					ErrMsg "Unknown command: " & j(0)
+			End Select
+		Case 2
+			t2 = Split(j(2), "\")
+			nt2 = UBound(t2)
+			
+			fn2 = t2(nt2)	' file name 2
+			p2 = Left(j(2), Len(j(2)) - Len(fn2))	' path 2
+			If InStr(fn2, ".") > 0 Then ErrMsg "Extension not allowed here: " & fn2
+			
+			'destination filename componenets
+			fff = Split(fn2, "^")
+			If UBound(fff) = 1 Then
+				DstFilenamePrefix = fff(0)
+				newStr = fff(1)
+			Else
+				ErrMsg "Wrong Destination Filename Prefix or NewString: " & fn2
+			End If
+	
+			' destination path
+			If InStr(p2, "<") > 0 Then
+				p = Split(p2, "<")
+				DstRootFolder = p(0)
+				pp = Split(p(1), ">")
+				If Len(pp(1)) > 1 Then
+					sx = pp(1)
+					If InStr(sx, "\") = 1 Then 
+						DstFolderSuffix= Right(sx, Len(sx) - 1)
+					Else
+						ErrMsg "Wrong Destination Folder Suffix: " & p1
+					End If
+				End If
+			Else
+				If Right(p2, 1) <> "\" Then 
+					DstFolder = p2 & "\"
+				Else
+					DstFolder = p2
+				End If
+			End If
+
+			overWrite = (InStr(command, "overwrite") > 0)
+			Select Case command
+				Case "copy", "copyoverwrite"
+					If Len(SrcFolder) > 0 Then
+						If Len(DstFolder) > 0 Then
+							CopyFilesFolderToFolder SrcFolder, DstFolder, DstFilenamePrefix, Extension, SearchStr, oldStr, newStr, overWrite
+						ElseIf Len(DstRootFolder) > 0 Then
+							CopyFilesFolderToSubfolders SrcFolder, DstRootFolder, DstFolderSuffix, DstFilenamePrefix, Extension, SearchStr, oldStr, newStr, overWrite
+						Else
+							ErrMsg "Wrong Destination Folder: " & p2
+						End If
+					ElseIf Len(SrcRootFolder) > 0 Then
+						If Len(DstFolder) > 0 Then
+							CopyFilesSubfoldersToFolder SrcRootFolder, SrcFolderSuffix, DstFolder, DstFilenamePrefix, Extension, SearchStr, oldStr, newStr, overWrite
+						ElseIf Len(DstRootFolder) > 0 Then
+							CopyFilesSubfoldersToSubfolders SrcRootFolder, SrcFolderSuffix, DstRootFolder, DstFolderSuffix, DstFilenamePrefix, Extension, SearchStr, oldStr, newStr, overWrite
+						Else
+							ErrMsg "Wrong Destination Folder: " & p2
+						End If
+					Else
+						ErrMsg "Wrong Source Folder: " & p1
+					End If
+				Case "move", "moveoverwrite"
+					If Len(SrcFolder) > 0 Then
+						If Len(DstFolder) > 0 Then
+							MoveFilesFolderToFolder SrcFolder, DstFolder, DstFilenamePrefix, Extension, SearchStr, oldStr, newStr, overWrite
+						ElseIf Len(DstRootFolder) > 0 Then
+							MoveFilesFolderToSubfolders SrcFolder, DstRootFolder, DstFolderSuffix, DstFilenamePrefix, Extension, SearchStr, oldStr, newStr, overWrite
+						Else
+							ErrMsg "Wrong Destination Folder: " & p2
+						End If
+					ElseIf Len(SrcRootFolder) > 0 Then
+						If Len(DstFolder) > 0 Then
+							MoveFilesSubfoldersToFolder SrcRootFolder, SrcFolderSuffix, DstFolder, DstFilenamePrefix, Extension, SearchStr, oldStr, newStr, overWrite
+						ElseIf Len(DstRootFolder) > 0 Then
+							MoveFilesSubfoldersToSubfolders SrcRootFolder, SrcFolderSuffix, DstRootFolder, DstFolderSuffix, DstFilenamePrefix, Extension, SearchStr, oldStr, newStr, overWrite
+						Else
+							ErrMsg "Wrong Destination Folder: " & p2
+						End If
+					Else
+						ErrMsg "Wrong Source Folder: " & p1
+					End If
+				Case Else
+					ErrMsg "Unknown command: " & j(0)
+			End Select
+		Case Else
+			ErrMsg "Wrong number of spaces"
+	End Select
 End Sub

@@ -1,9 +1,10 @@
 ﻿
 # files-tools
-**Repository of VBS scripts to copy, move, delete and rename files**
+**Repository of VBS scripts to count, copy, move, delete and rename files**
 
-## Scripts in this Repository
+## Scripts in this Repository:
 
+files-tools.WSF
 copy-files-folder-to-folder.WSF  
 copy-files-subfolders-to-folder.WSF  
 copy-files-folder-to-subfolders.WSF  
@@ -21,14 +22,28 @@ count-files-in-folder.WSF
 count-files-in-subfolders.WSF  
 
 Supply script arguments by editing constants in .WSF files.  
+Scripts create log file in destination folder with name: files-tools-logfile-yyyy-mm-dd-hh-mm-ss.txt.
+
+___
+### files-tools.WSF
+You may use files-tools.WSF to perform all actions of counting, copying, moving, renaming and deleting files:
+
+**copy|move|copyOverwrite|moveOverwrite F:\SrcFolder\<<AnyFolder>>\SrcFolderSuffix\SearchStr^OldStr.Ext F:\DstFolder\<<StarNameFolder>>\DstFolderSuffix\FNPrefix^NewStr**  
+**rename F:\Folder\<<AnyFolder>>\FolderSuffix\SearchStr^OldStr^NewStr.Ext**  
+**delete|count F:\Folder\<<AnyFolder>>\FolderSuffix\SearchStr.Ext**  
+
 Common arguments are:  
->**Extension** - Only files with this extension will be processed. No wildcards. Required.  
+>**SourceFolder** - Single source folder containing files to be copied.  
+**SourceRootFolder** - Folder with subfolders containing files to be moved.  
+**SourceFolderSuffix** - SourceRootFolder's any subfolder's subfolder name. By supplying non-empty SourceFolderSuffix you move files from SourceRootFolder's subfolder's subfolder: SourceRootFolder\AnySubfolder\SourceFolderSuffix\.  
+**DestinationFolder** - Single destination folder.  
+**DestinationFolderSuffix** - DestinationRootFolder's StarName subfolder's subfolder name. By supplying non-empty DestinationFolderSuffix you copy files to DestinationRootFolder's subfolder's subfolder: DestinationRootFolder\StarNameSubfolder\DestinationFolderSuffix\.  
+**Extension** - Only files with this extension in the source foulders will be processed. Required. No wildcards.  
 **SearchString** - Only files with SearchString within file name will be processed. Give empty string to process all files.  
 **OldString**, **NewString** - Replace a non-empty OldString with NewString in destination file names.  
 **DestinationFilenamePrefix** - String to be attached at the begining of destination file names.  
 **Overwrite** - When *True*, files in destination will be overwritten.
 
-Scripts create log file in destination folder with name: files-tools-logfile-yyyy-mm-dd-hh-mm-ss.txt.
 ___
 ### copy-files-folder-to-folder.WSF
 **CopyFilesFolderToFolder (SourceFolder, DestinationFolder,**

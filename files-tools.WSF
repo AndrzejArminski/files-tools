@@ -1,0 +1,49 @@
+<!--
+files-tools.WSF
+  Copies, moves, renames, deletes or counts files in folders or subfolders.
+
+Command syntx:
+  copy|move|copyOverwrite|moveOverwrite F:\SrcFolder\<AnyFolder>\SrcFolderSuffix\SearchStr^OldStr.Ext F:\DstFolder\<StarNameFolder>\DstFolderSuffix\FNPrefix^NewStr
+  rename F:\Folder\<AnyFolder>\FolderSuffix\SearchStr^OldStr^NewStr.txt
+  delete|count F:\Folder\<AnyFolder>\FolderSuffix\SearchStr.txt
+  delete F:\Folder\<AnyFolder>\
+-->
+
+<job id="files-tools.WSF">
+
+	<script language="VBScript" src="files-tools-LIB.vbs"/>
+	<script language="VBScript">
+		Option Explicit
+
+		' Const job = "copy F:\Src\^_y.txt F:\Dst\<>\^AY"
+		' Const job = "copy F:\Src\_x^_x.txt F:\Dst\<>\^FX"
+		' Const job = "copy F:\Src\<>\_x^_x.txt F:\Dst\<>\^GX"
+		' Const job = "copy F:\Src\<>\_x^_x.txt F:\Dst\^EX"
+		' Const job = "copy F:\Src\<>\01\_x^_x.txt F:\Dst\^DX"
+		' Const job = "copy F:\Src\<>\01\SV^SV.txt F:\Dst\<>\SV^WX"
+		' Const job = "copy F:\Src\<>\01\SV^SV.txt F:\Dst\<>\03\SV^WX"
+		' Const job = "copy F:\Src\<>\01\_x^_x.txt F:\Dst\<>\03\^SX"
+
+		' Const job = "copyOverwrite F:\Src\<>\01\_x^_x.txt F:\Dst\^DX"
+
+		' Const job = "move F:\Dst\ZXXXZ^ZXXXZ_.txt F:\Src\00^_U"
+		' Const job = "move F:\Src\^_y.txt F:\Dst\<>\^AY"
+		' Const job = "move F:\Src\<>\01\_x^_x.txt F:\Dst\<>\03\^SX"
+		' Const job = "move F:\Src\<>\01\_x^_x.txt F:\Dst\<>\03\___^SX"
+
+		' Const job = "moveOverwrite F:\Src\<>\01\_x^_x.txt F:\Dst\<>\03\^SX"
+
+		' Const job = "rename F:\Dst\DX^DX^ZXXXZ_.txt"
+		' Const job = "rename F:\Src\<>\01\_V^_V^SV.txt"
+		' Const job = "rename F:\Dst\<>\03\SX^SX^XXX_.txt"
+
+		' Const job = "count F:\Dst\files.txt"
+		' Const job = "count F:\Dst\<>\03\.txt"
+		' Const job = "count F:\Dst\<>\03\X^.txt"
+
+		' Const job = "delete F:\Dst\<>\03\V^.txt"
+		' Const job = "delete F:\Dst\AA Cep\XXX.txt"
+
+		Parse job
+	</script>
+</job>

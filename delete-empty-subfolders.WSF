@@ -9,7 +9,8 @@
 	<script language="VBScript">
 	
 		Option Explicit
-		Const RootFolder = "F:\OneDrive\AstroProjects\test\SKY\"   ' Folder with empty subfolders to be deleted.
+		' Const RootFolder = "F:\OneDrive\AstroProjects\test\SKY\"   ' Folder with empty subfolders to be deleted.
+		Const RootFolder = "F:\Src\"
 		
 		DeleteEmptySubfolders RootFolder
 	</script>
